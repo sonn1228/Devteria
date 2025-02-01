@@ -2,63 +2,67 @@ package com.sonnguyen.base.service;
 
 import com.sonnguyen.base.dto.request.UserCreationRequest;
 import com.sonnguyen.base.dto.request.UserUpdateRequest;
-import com.sonnguyen.base.exception.AppException;
-import com.sonnguyen.base.exception.ErrorCode;
+import com.sonnguyen.base.exception.CommonException;
 import com.sonnguyen.base.model.User;
 import com.sonnguyen.base.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class UserService {
+    private final UserRepository userRepository;
+
     @Autowired
-    private UserRepository userRepository;
+    public UserService(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
 
     public User createUser(UserCreationRequest request) {
-        User user = new User();
-
-        if(userRepository.existsByUsername(request.getUsername())){
-            throw new AppException(ErrorCode.USER_EXISTED);
+        if (userRepository.existsByUsername(request.getUsername())) {
+            throw new CommonException("Username already exists", HttpStatus.CONFLICT);
         }
 
+        User user = new User();
         user.setUsername(request.getUsername());
-        user.setPassword(request.getPassword());
+
+        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setFirstName(request.getFirstName());
         user.setLastName(request.getLastName());
         user.setDob(request.getDob());
-
         return userRepository.save(user);
     }
 
-    public List<User> getAllUser() {
+    public List<User> getAllUsers() {
         return userRepository.findAll();
     }
 
     public User updateUser(String userId, UserUpdateRequest request) {
-        Optional<User> optionalUser = userRepository.findById(userId);
 
-        if (optionalUser.isPresent()) {
-            User user = optionalUser.get();
-            user.setPassword(request.getPassword());
-            user.setFirstName(request.getFirstName());
-            user.setLastName(request.getLastName());
-            user.setDob(request.getDob());
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CommonException("User not found", HttpStatus.NOT_FOUND));
 
-            return userRepository.save(user);
-        } else {
-            throw new RuntimeException("User with ID " + userId + " not found.");
-        }
+        user.setPassword(request.getPassword());
+        user.setFirstName(request.getFirstName());
+        user.setLastName(request.getLastName());
+        user.setDob(request.getDob());
+        return userRepository.save(user);
     }
 
     public User getUserById(String userId) {
         return userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User with ID " + userId + " not found."));
+                .orElseThrow(() -> new CommonException("User not found", HttpStatus.NOT_FOUND));
     }
 
-    public void deleteById(String userId){
+    public void deleteById(String userId) {
+        if (!userRepository.existsById(userId)) {
+            throw new CommonException("User not found", HttpStatus.NOT_FOUND);
+        }
         userRepository.deleteById(userId);
     }
 }

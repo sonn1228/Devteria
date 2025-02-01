@@ -8,7 +8,7 @@ import java.time.LocalDate;
 @Data
 public class UserCreationRequest {
 
-    @Size(min = 8, message = "Username min 8")
+    @Size(min = 4, message = "Username min 8")
     private String username;
     private String password;
     private String firstName;
