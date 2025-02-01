@@ -1,11 +1,9 @@
 package com.sonnguyen.base.controller;
 
-import com.sonnguyen.base.dto.out.AuthResponse;
 import com.sonnguyen.base.dto.out.IntrospectResponse;
 import com.sonnguyen.base.dto.request.ApiResponse;
 import com.sonnguyen.base.dto.request.AuthRequest;
 import com.sonnguyen.base.dto.request.IntrospectRequest;
-import com.sonnguyen.base.model.User;
 import com.sonnguyen.base.service.AuthService;
 import com.sonnguyen.base.utils.JwtService;
 import jakarta.validation.Valid;

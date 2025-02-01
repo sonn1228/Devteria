@@ -20,15 +20,13 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableMethodSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
-
+    private final JwtService jwtService;
     private final String[] PUBLIC_ENDPOINTS = {
             "/api/v1/users",
             "/api/v1/auth/login",
             "/api/v1/auth/register",
             "/api/v1/auth/introspect"
     };
-
-    private final JwtService jwtService;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -39,7 +37,6 @@ public class SecurityConfig {
         http.csrf(AbstractHttpConfigurer::disable);
         return http.build();
     }
-
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
