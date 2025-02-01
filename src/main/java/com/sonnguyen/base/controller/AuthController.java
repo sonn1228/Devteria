@@ -6,6 +6,7 @@ import com.sonnguyen.base.dto.request.AuthRequest;
 import com.sonnguyen.base.dto.request.IntrospectRequest;
 import com.sonnguyen.base.service.AuthService;
 import com.sonnguyen.base.utils.JwtService;
+import io.jsonwebtoken.JwtException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -39,12 +40,14 @@ public class AuthController {
                         .build()
         );
     }
+
     @PostMapping("/introspect")
     public ApiResponse<IntrospectResponse> introspect(@RequestBody IntrospectRequest request) {
-        boolean isValid = jwtService.validateToken(request);
+        boolean isValid = authService.introspect(request.getToken());
+        String message = isValid ? "Token is valid" : "Token is invalid";
         return ApiResponse.<IntrospectResponse>builder()
                 .success(isValid)
-                .message(isValid ? "Token is valid" : "Token is invalid")
+                .message(message)
                 .data(IntrospectResponse.builder()
                         .valid(isValid)
                         .build())

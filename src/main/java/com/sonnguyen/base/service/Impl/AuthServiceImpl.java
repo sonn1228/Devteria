@@ -6,6 +6,7 @@ import com.sonnguyen.base.model.User;
 import com.sonnguyen.base.repository.UserRepository;
 import com.sonnguyen.base.service.AuthService;
 import com.sonnguyen.base.utils.JwtService;
+import io.jsonwebtoken.JwtException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -45,5 +46,23 @@ public class AuthServiceImpl implements AuthService {
         user.setUsername(username);
         user.setPassword(passwordEncoder.encode(password));
         userRepository.save(user);
+    }
+
+    @Override
+    public boolean introspect(String token) {
+        boolean isValid = false;
+        String message = "Token is invalid";
+        try {
+            jwtService.extractUsername(token);
+            if (!jwtService.isTokenExpired(token)) {
+                isValid = true;
+                message = "Token is valid";
+            } else {
+                message = "Token is expired";
+            }
+        } catch (JwtException e) {
+            message = "Token is invalid: " + e.getMessage();
+        }
+        return isValid;
     }
 }
