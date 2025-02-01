@@ -11,6 +11,7 @@ import java.util.Date;
 @Service
 public class JwtService {
     private static final Key SECRET_KEY = Keys.secretKeyFor(SignatureAlgorithm.HS512);
+
     public String generateToken(String username) {
         return Jwts.builder()
                 .setSubject(username)
