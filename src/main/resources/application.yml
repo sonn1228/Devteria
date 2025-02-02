@@ -31,7 +31,6 @@ spring:
 
 
 jwt:
-  secret: 9TnKrugrHJNqf85He07ZssTEg2lb+d6+087I/hsDQn7zEc62Ju+PJOUBlKG1iPZrjpNyGVlT44/g3S3182cYnQ==
   expirationMs: 3600000
-  signerKey:
+  SECRET_KEY: OaO+fK8ipdbfp2Xeet5orTq1yTwF5UxuF8tZPTlkE7n77eqlJ8XFL8TbHqgPfHDHT10cyEbfyyc=
 

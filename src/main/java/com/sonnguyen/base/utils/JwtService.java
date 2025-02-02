@@ -2,6 +2,7 @@ package com.sonnguyen.base.utils;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.security.Key;
@@ -10,8 +11,9 @@ import java.util.Date;
 @Service
 public class JwtService {
 
-    private static final String SECRET_KEY = "your-secret-key-that-should-be-long-enough-for-security";
-    private static final long EXPIRATION_TIME = 86400000; // 24h
+    @Value("${jwt.SECRET_KEY}")
+    private String SECRET_KEY;
+    private static final long EXPIRATION_TIME = 86400000;
 
     private Key getSignInKey() {
         return Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
@@ -40,7 +42,7 @@ public class JwtService {
                 .setSubject(username)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
-                .signWith(getSignInKey(), SignatureAlgorithm.HS256)
+                .signWith(getSignInKey(), SignatureAlgorithm.HS512)
                 .compact();
     }
 
