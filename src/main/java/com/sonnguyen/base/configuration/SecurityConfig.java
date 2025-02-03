@@ -18,6 +18,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
+import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
 
 import javax.crypto.spec.SecretKeySpec;
@@ -28,8 +30,10 @@ import javax.crypto.spec.SecretKeySpec;
 @RequiredArgsConstructor
 public class SecurityConfig {
     private final JwtService jwtService;
+
     @Value("${jwt.SECRET_KEY}")
     private String SECRET_KEY;
+
     private final String[] PUBLIC_ENDPOINTS = {
             "/api/v1/users",
             "/api/v1/auth/login",
@@ -42,24 +46,33 @@ public class SecurityConfig {
         http
                 .cors(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(request ->
-                        request.requestMatchers(HttpMethod.POST, PUBLIC_ENDPOINTS).permitAll()
-                                .requestMatchers(HttpMethod.GET, "/api/v1/users")
-                                .hasAuthority("SCOPE_ADMIN")
-                                .anyRequest().authenticated());
-        http.oauth2ResourceServer(oauth2 ->
-                oauth2.jwt(jwtConfigurer -> jwtConfigurer.decoder(jwtDecoder())));
-        http.csrf(AbstractHttpConfigurer::disable);
+                .authorizeHttpRequests(requests -> requests
+                        .requestMatchers(HttpMethod.POST, PUBLIC_ENDPOINTS).permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/users").hasRole("ADMIN")
+                        .anyRequest().authenticated())
+                .oauth2ResourceServer(oauth2 -> oauth2.jwt(jwtConfigurer ->
+                        jwtConfigurer.jwtAuthenticationConverter(jwtAuthenticationConverter())));
         return http.build();
     }
 
     @Bean
-    JwtDecoder jwtDecoder() {
+    public JwtDecoder jwtDecoder() {
         SecretKeySpec secretKeySpec = new SecretKeySpec(SECRET_KEY.getBytes(), "HS512");
         return NimbusJwtDecoder
                 .withSecretKey(secretKeySpec)
                 .macAlgorithm(MacAlgorithm.HS512)
                 .build();
+    }
+
+    @Bean
+    public JwtAuthenticationConverter jwtAuthenticationConverter() {
+        JwtGrantedAuthoritiesConverter authoritiesConverter = new JwtGrantedAuthoritiesConverter();
+        authoritiesConverter.setAuthorityPrefix("ROLE_"); // Thay "SCOPE_" bằng "ROLE_"
+        authoritiesConverter.setAuthoritiesClaimName("scope"); // Lấy quyền từ claim "scope"
+
+        JwtAuthenticationConverter authenticationConverter = new JwtAuthenticationConverter();
+        authenticationConverter.setJwtGrantedAuthoritiesConverter(authoritiesConverter);
+        return authenticationConverter;
     }
 
     @Bean
@@ -71,5 +84,4 @@ public class SecurityConfig {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-
 }
