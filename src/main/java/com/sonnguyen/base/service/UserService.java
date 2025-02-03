@@ -2,6 +2,7 @@ package com.sonnguyen.base.service;
 
 import com.sonnguyen.base.dto.request.UserCreationRequest;
 import com.sonnguyen.base.dto.request.UserUpdateRequest;
+import com.sonnguyen.base.enums.Role;
 import com.sonnguyen.base.exception.CommonException;
 import com.sonnguyen.base.model.User;
 import com.sonnguyen.base.repository.UserRepository;
@@ -30,11 +31,13 @@ public class UserService {
         User user = new User();
         user.setUsername(request.getUsername());
 
-        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-        user.setPassword(passwordEncoder.encode(request.getPassword()));
+        user.getRoles().add(Role.USER.name());
         user.setFirstName(request.getFirstName());
         user.setLastName(request.getLastName());
         user.setDob(request.getDob());
+        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
+
         return userRepository.save(user);
     }
 

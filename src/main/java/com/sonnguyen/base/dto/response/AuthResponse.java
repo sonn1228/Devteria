@@ -1,4 +1,4 @@
-package com.sonnguyen.base.dto.out;
+package com.sonnguyen.base.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

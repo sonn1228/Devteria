@@ -1,6 +1,6 @@
 package com.sonnguyen.base.service.Impl;
 
-import com.sonnguyen.base.dto.out.AuthResponse;
+import com.sonnguyen.base.dto.response.AuthResponse;
 import com.sonnguyen.base.exception.CommonException;
 import com.sonnguyen.base.model.User;
 import com.sonnguyen.base.repository.UserRepository;
@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
+
 public class AuthServiceImpl implements AuthService {
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
@@ -29,7 +30,10 @@ public class AuthServiceImpl implements AuthService {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(username, password));
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        String token = jwtService.generateToken(username);
+
+        User user = userRepository.findByUsername(username);
+
+        String token = jwtService.generateToken(user);
         return AuthResponse.builder()
                 .token(token)
                 .authenticated(true)

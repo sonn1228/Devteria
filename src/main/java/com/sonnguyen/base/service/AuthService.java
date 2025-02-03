@@ -1,6 +1,6 @@
 package com.sonnguyen.base.service;
 
-import com.sonnguyen.base.dto.out.AuthResponse;
+import com.sonnguyen.base.dto.response.AuthResponse;
 
 public interface AuthService {
     AuthResponse login(String username, String password);

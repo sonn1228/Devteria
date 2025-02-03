@@ -1,12 +1,11 @@
 package com.sonnguyen.base.controller;
 
-import com.sonnguyen.base.dto.out.IntrospectResponse;
+import com.sonnguyen.base.dto.response.IntrospectResponse;
 import com.sonnguyen.base.dto.request.ApiResponse;
 import com.sonnguyen.base.dto.request.AuthRequest;
 import com.sonnguyen.base.dto.request.IntrospectRequest;
 import com.sonnguyen.base.service.AuthService;
 import com.sonnguyen.base.utils.JwtService;
-import io.jsonwebtoken.JwtException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
